@@ -1,4 +1,8 @@
 /* Note, this is not actually a javascript source file. This is to be used for Google Sheets in the Tools->Script Editor. */
+// https://github.com/mikelietz/18xx-sheet-scripts/blob/master/1846.js
+
+/* Version 1.1 */
+
 function nextRound( s ) {
   var source = s; // current tab
   var sheet = SpreadsheetApp.getActive();
@@ -27,6 +31,18 @@ function nextRound( s ) {
   if( destination.substring( 0, 2 ) == 'SR' ) {
       sheet.getSheetByName( destination ).setTabColor( "888888" );
   }  
+
+  var numPlayers = sheet.getRange( 'A1' ).getValue();
+  if ( numPlayers < 5 ) {
+    // hide non-player rows
+    sheet.getSheetByName( destination ).hideRows( 3 + numPlayers, 5 - numPlayers );
+  }
+  
+  // hide independent columns
+  if ( Phase == 'IV' || sheet.getRange( 'F3:G7' ).isBlank() ) {
+      sheet.getSheetByName( destination ).hideColumns( 6, 2 ); // hide them both
+  }
+
 }
 
 function DetermineNextRound( source, phase ) {
@@ -66,7 +82,7 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu( '1846 Menu' )
       .addItem( 'Next Round' , 'menuItem1' )
-      .addItem( 'Destructive Reset' , 'Cleanup' )
+      .addItem( 'Destructive Reset' , 'Cleanup' ) /* uncomment this line to have an easy cleanup in the menu */
   .addToUi();
 }
 
