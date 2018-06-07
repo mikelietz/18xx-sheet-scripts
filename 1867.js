@@ -1,4 +1,7 @@
 /* Note, this is not actually a javascript source file. This is to be used for Google Sheets in the Tools->Script Editor. */
+
+/* Version 1.0 */
+
 function nextRound( s ) {
   var source = s; // current tab
   var sheet = SpreadsheetApp.getActive();
@@ -22,7 +25,7 @@ function nextRound( s ) {
   CopyRange( source, destination, 'A10:A10' ); // phase
   CopyRange( source, destination, 'B3:B8' ); // players and priority
   CopyRange( source, destination, 'F3:AO8' ); // player stocks and privates
-  CopyRange( source, destination, 'V9:AJ10' ); // company pool and treasury shares
+  CopyRange( source, destination, 'V9:AJ9' ); // company pool
   CopyRange( source, destination, 'F13:AL17' ); // company trains, tokens, etc
   CopyRange( source, destination, 'AQ23:AS25' ); // Trains in Market
   sheet.getRange( 'F12:AL12' ).setValues( sheet.getRange( 'F11:AL11' ).getValues() ); // prepopulate end price with begin price. Moves down a row, so doesn't use CopyRange function
