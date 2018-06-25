@@ -139,7 +139,7 @@ function onOpen() {
   .addToUi();
 }
 
-function nextRound() {
+function menuItem1() {
   nextRound( 
     SpreadsheetApp.getActiveSheet().getRange( 'AF11' ).getValues() // source
   );
