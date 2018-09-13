@@ -1,7 +1,7 @@
 /* Note, this is not actually a javascript source file. This is to be used for Google Sheets in the Tools->Script Editor. */
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/1830.js
 
-/* Version 0.9 */
+/* Version 0.9.1 */
 
 function nextRound( s, d ) {
   var source = s; // current tab
@@ -26,11 +26,11 @@ function nextRound( s, d ) {
   CopyRange( source, destination, 'A3:B9' ); // players and priority
   if ( Phase < 5 ) {
     CopyRange( source, destination, 'F3:W9' ); // player stocks and privates
-    CopyRange( source, destination, 'F9:U17' ); // company share price and other company stuff including privates
+    CopyRange( source, destination, 'F12:U17' ); // company share price and other company stuff including privates
   } else {
     // Privates are closed in phase 5.
     CopyRange( source, destination, 'F3:U9' ); // player stocks
-    CopyRange( source, destination, 'F9:U15' ); // company share price and other company stuff
+    CopyRange( source, destination, 'F12:U15' ); // company share price and other company stuff
   }
   CopyRange( source, destination, 'F10:U10' ); // company shares in market
   CopyRange( source, destination, 'Y20:AA22' ); // Trains in Market
