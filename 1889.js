@@ -15,28 +15,34 @@ function nextRound( s ) {
     
     sheet.getRange( 'F15:R18' ).setNumberFormat( '@' ); // plaintext for X/X stuff
     CopyRange( source, destination, 'A11:A11' ); // phase
-    CopyRange( source, destination, 'A3:B8' ); // players and priority
+    CopyRange( source, destination, 'B3:B8' ); // player priority
     CopyRange( source, destination, 'F3:U8' ); // player stocks and privates
     if ( Phase < 5 ) {
       CopyRange( source, destination, 'F3:U8' ); // player stocks and privates
-      CopyRange( source, destination, 'F15:S18' ); // company share price and other company stuff including privates
+      CopyRange( source, destination, 'F14:S18' ); // company end share price and other company stuff including privates
     } else {
       // Privates are closed in phase 5, except for Uno-Takamatsu/G if owned by a player, so ...
       CopyRange( source, destination, 'F3:U8' ); // player stocks
-      CopyRange( source, destination, 'F15:S16' ); // company share price and other company stuff
+      CopyRange( source, destination, 'F14:S16' ); // company end share price and other company stuff
     } 
     
-    CopyRange( source, destination, 'F10:R12' ); // company shares in market
+    CopyRange( source, destination, 'F10:R10' ); // company shares in market
+    CopyRange( source, destination, 'F12:R12' ); // company IPO prices
     CopyRange( source, destination, 'W20:Y21' ); // Trains in Market
   } else {  
     // ISR to SR1
+    var destination = 'SR1';
     var templateSheet = sheet.getSheetByName( 'template' );
-    sheet.insertSheet( 'SR1', 999, { template: templateSheet } );
+    sheet.insertSheet( destination, 999, { template: templateSheet } );
     sheet.getRange( 'F15:R18' ).setNumberFormat( '@' ); // plaintext for X/X stuff
     CopyRange( source, destination, 'A11:A11' ); // phase
-    CopyRange( source, destination, 'A3:B8' ); // players and priority
+    CopyRange( source, destination, 'A8:B8' ); // players and priority
     CopyRange( source, destination, 'U3:U8' ); // player stocks and privates
+
+    sheet.getSheetByName( 'SR1' ).getRange( 'T3:T8' ).setValues( sheet.getSheetByName( 'SR1' ).getRange( 'U3:U8' ).getValues() ); // Copy owned to income privates
+     
     sheet.getRange( 'F13:R13' ).setValue( '' ); // blank out the previous market price for companies
+    sheet.getRange( 'F19:R19' ).setValue( '' ); // blank out the begin treasury for companies
   }
   // set up the AC column
   sheet.getRange( 'AC11' ).setValue( source ); // previous round
