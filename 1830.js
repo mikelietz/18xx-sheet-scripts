@@ -67,7 +67,7 @@ function DetermineNextRound( source, phase ) {
   var thisRound = ss.substring( 0, 2 ); // SR or OR (or IS)
   var thisRoundNumber = parseFloat( ss.substring( 2, 6 ) ); // 1, 1.1, 2.2, etc (will never be bigger than SR99.3?)
   var thisR = ( thisRoundNumber * 10 ) % 10; // 0, 1, 2
-  var ORsPerPhase = [ 0,1,2,2,3,3,3 ];
+  var ORsPerPhase = [ 0,1,1,2,2,3,3 ];
   var numberOfORs = ORsPerPhase[ phase ]; // phases 1-6
                      
   // return the next round
