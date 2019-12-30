@@ -116,6 +116,7 @@ function menuItem1() {
 }
 
 function Cleanup() {
+  // delete any leftover tabs
   var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
   var numSheets = SpreadsheetApp.getActiveSpreadsheet().getNumSheets();
   
@@ -126,5 +127,17 @@ function Cleanup() {
      SpreadsheetApp.getActiveSpreadsheet().deleteSheet( sheets[i] ); 
     }
   }
+
+  // clear out the Privates Auction
+  var thisSheet = SpreadsheetApp.getActive().getSheetByName( 'Privates Auction' );
+  thisSheet.getRange( 'A3:A8' ).setValue( '' ); // blank out the players
+  thisSheet.getRange( 'G3:M8' ).setValue( '' ); // blank out the bids
+  thisSheet.getRange( 'T3:T8' ).setValue( '' ); // blank out the privates  
+  
+  // hide the template
+  var templateSheet = SpreadsheetApp.getActive().getSheetByName( 'template' );
+  templateSheet.showSheet()
+  templateSheet.hideSheet()
+  
   return;
 }
