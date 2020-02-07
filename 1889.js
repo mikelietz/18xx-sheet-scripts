@@ -143,7 +143,7 @@ function Cleanup() {
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName( 'Privates Auction' );
   thisSheet.getRange( 'A3:A8' ).setValue( '' ); // blank out the players
   thisSheet.getRange( 'G3:M8' ).setValue( '' ); // blank out the bids
-  thisSheet.getRange( 'U3:U8' ).setValue( '' ); // blank out the privates  
+  thisSheet.getRange( 'T3:T8' ).setValue( '' ); // blank out the privates  
   
   // hide the template
   var templateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName( 'template' );
