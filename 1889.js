@@ -1,22 +1,28 @@
 /* Note, this is not actually a javascript source file. This is to be used for Google Sheets in the Tools->Script Editor. */
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/1889.js
+// @OnlyCurrentDoc
 
-/* Version 1.3 */
+
+/* Version 1.4 */
 function nextRound( s ) {
-  var source = s; // current tab
+  var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
   var sheet = SpreadsheetApp.getActive();
-
+  var orp = parseInt( PropertiesService.getDocumentProperties().getProperty( 'orPhase' ) );
+  if( source.substring( 0, 2 ) == 'SR' ) { //sheet properties can be used like global variables.  Initial property is ( 'orPhase', '2' ).  This updates only during SR
+    PropertiesService.getDocumentProperties().setProperty( 'orPhase', sheet.getRange( 'A11' ).getValue() );
+    orp = parseInt( PropertiesService.getDocumentProperties().getProperty( 'orPhase' ) );
+  } 
+  
   if( source != "Privates Auction" ) {
     var Phase = sheet.getRange( 'A11' ).getValue();
  
-    var destination = DetermineNextRound( s, Phase ); // new tab
+    var destination = DetermineNextRound( s, orp ); // new tab
     var templateSheet = sheet.getSheetByName( 'template' );
     sheet.insertSheet( destination, 999, { template: templateSheet } );
     
     sheet.getRange( 'F15:R18' ).setNumberFormat( '@' ); // plaintext for X/X stuff
     sheet.getRange( 'T3:T8' ).setNumberFormat( '@' ); // plaintext for X X stuff
     
-    //CopyRange( source, destination, 'A11:A11' ); // phase
     CopyRange( source, destination, 'B3:B8' ); // player priority
     CopyRange( source, destination, 'F3:T8' ); // player stocks and privates
     if ( Phase < 5 ) {
@@ -35,12 +41,16 @@ function nextRound( s ) {
     var templateSheet = sheet.getSheetByName( 'template' );
     sheet.insertSheet( destination, 999, { template: templateSheet } );
     sheet.getRange( 'F15:R18' ).setNumberFormat( '@' ); // plaintext for X/X stuff
+    sheet.getRange( 'T3:T8' ).setNumberFormat( '@' ); // plaintext for X X stuff
+
     CopyRange( source, destination, 'A11:A11' ); // phase
     CopyRange( source, destination, 'B3:B8' ); // player priority
     CopyRange( source, destination, 'T3:T8' ); // player stocks and privates
 
     sheet.getRange( 'F13:R13' ).setValue( '' ); // blank out the previous market price for companies
     sheet.getRange( 'F19:R19' ).setValue( '' ); // blank out the begin treasury for companies
+
+    PropertiesService.getDocumentProperties().setProperty( 'orPhase', 2 );
   }
   // set up the AC column
   sheet.getRange( 'AC11' ).setValue( source ); // previous round
@@ -59,14 +69,15 @@ function nextRound( s ) {
   
 }
 
-function DetermineNextRound( source, phase ) {
+function DetermineNextRound( source, orp ) {
   var ss = String( source );
   var thisRound = ss.substring( 0, 2 ); // SR or OR (or IS)
   var thisRoundNumber = parseFloat( ss.substring( 2, 6 ) ); // 1, 1.1, 2.2, etc (will never be bigger than SR99.3?)
   var thisR = ( thisRoundNumber * 10 ) % 10; // 0, 1, 2
   var ORsPerPhase = [ 0,1,2,2,2,3,3 ];
-  var numberOfORs = ORsPerPhase[ phase ]; // phases 1-6
-                     
+  if ( orp == "D" ) { orp = 6; }
+  var numberOfORs = ORsPerPhase[ orp ]; // phases 1-6
+
   // return the next round
   switch ( thisRound + thisR + numberOfORs ) { // read as round whatever X out of Y
     case 'SR01':
@@ -129,13 +140,13 @@ function Cleanup() {
   }
 
   // clear out the Privates Auction
-  var thisSheet = SpreadsheetApp.getActive().getSheetByName( 'Privates Auction' );
+  var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName( 'Privates Auction' );
   thisSheet.getRange( 'A3:A8' ).setValue( '' ); // blank out the players
   thisSheet.getRange( 'G3:M8' ).setValue( '' ); // blank out the bids
-  thisSheet.getRange( 'T3:T8' ).setValue( '' ); // blank out the privates  
+  thisSheet.getRange( 'U3:U8' ).setValue( '' ); // blank out the privates  
   
   // hide the template
-  var templateSheet = SpreadsheetApp.getActive().getSheetByName( 'template' );
+  var templateSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName( 'template' );
   templateSheet.showSheet()
   templateSheet.hideSheet()
   
