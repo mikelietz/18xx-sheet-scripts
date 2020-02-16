@@ -2,8 +2,7 @@
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/1889.js
 // @OnlyCurrentDoc
 
-
-/* Version 1.4 */
+/* Version 1.5 */
 function nextRound( s ) {
   var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
   var sheet = SpreadsheetApp.getActive();
@@ -74,17 +73,19 @@ function DetermineNextRound( source, orp ) {
   var thisRound = ss.substring( 0, 2 ); // SR or OR (or IS)
   var thisRoundNumber = parseFloat( ss.substring( 2, 6 ) ); // 1, 1.1, 2.2, etc (will never be bigger than SR99.3?)
   var thisR = ( thisRoundNumber * 10 ) % 10; // 0, 1, 2
-  var ORsPerPhase = [ 0,1,2,2,2,3,3 ];
+
+  var ORsPerPhase = [ 0,0,1,2,2,2,3 ];
   if ( orp == "D" ) { orp = 6; }
   var numberOfORs = ORsPerPhase[ orp ]; // phases 1-6
-
   // return the next round
   switch ( thisRound + thisR + numberOfORs ) { // read as round whatever X out of Y
     case 'SR01':
+      return 'OR' + String( parseInt( thisRoundNumber ) );
     case 'SR02':
     case 'SR03':
       // next round is always OR.1
       return 'OR' + String( ( parseInt( thisRoundNumber ) + 0.1 ).toFixed( 1 ) ); // 0.1 + .1 = 1.19999999 otherwise (maybe)
+    case 'OR01':
     case 'OR11':
     case 'OR22':
     case 'OR33':
