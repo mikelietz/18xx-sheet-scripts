@@ -2,14 +2,18 @@
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/1889.js
 // @OnlyCurrentDoc
 
-/* Version 1.5 */
+/* Version 1.5.1 */
 function nextRound( s ) {
   var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
   var sheet = SpreadsheetApp.getActive();
-  var orp = parseInt( PropertiesService.getDocumentProperties().getProperty( 'orPhase' ) );
+  var orp = PropertiesService.getDocumentProperties().getProperty( 'orPhase' );
+  if( orp == 'D' ) { orp = 6; }
+  orp = parseInt( orp );
   if( source.substring( 0, 2 ) == 'SR' ) { //sheet properties can be used like global variables.  Initial property is ( 'orPhase', '2' ).  This updates only during SR
     PropertiesService.getDocumentProperties().setProperty( 'orPhase', sheet.getRange( 'A11' ).getValue() );
-    orp = parseInt( PropertiesService.getDocumentProperties().getProperty( 'orPhase' ) );
+    orp = PropertiesService.getDocumentProperties().getProperty( 'orPhase' );
+    if( orp == 'D' ) { orp = 6; }
+    orp = parseInt( orp );
   } 
   
   if( source != "Privates Auction" ) {
