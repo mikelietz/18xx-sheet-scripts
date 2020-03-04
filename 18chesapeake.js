@@ -3,9 +3,10 @@
 // @OnlyCurrentDoc
 
 /* Version 0.0 */
-function nextRound( s ) {
-  var source = s; // current tab
+function nextRound() {
+  var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName(); //this is tab name (also in AE13)
   var sheet = SpreadsheetApp.getActive();
+  var destination = DetermineNextRound( source ); // new tab
 
   if( source != "Privates Auction" ) {
 
@@ -14,8 +15,6 @@ function nextRound( s ) {
     var lastExportedTrain = exportedTrains.charAt( exportedTrains.length - 1);
     var Phase = Math.max( lastExportedTrain, sheet.getRange( 'A11' ).getValue() );
  
-    var destination = DetermineNextRound( s, Phase ); // new tab
-// Browser.msgBox( 'next round is ' + destination );  
     var templateSheet = sheet.getSheetByName( 'template' );
     sheet.insertSheet( destination, 999, { template: templateSheet } );
     
@@ -41,7 +40,6 @@ function nextRound( s ) {
     
   } else {  
     // ISR to SR1
-    var destination = 'SR1';
     var templateSheet = sheet.getSheetByName( 'template' );
     sheet.insertSheet( destination, 999, { template: templateSheet } );
     sheet.getRange( 'F15:U17' ).setNumberFormat( '@' ); // plaintext for X/X stuff
@@ -52,6 +50,10 @@ function nextRound( s ) {
 
     sheet.getRange( 'F13:U13' ).setValue( '' ); // blank out the previous market price for companies
     sheet.getRange( 'F19:U19' ).setValue( '' ); // blank out the begin treasury for companies
+
+    PropertiesService.getDocumentProperties().setProperty( 'SRPhase', 2 );
+    PropertiesService.getDocumentProperties().setProperty( 'ORCount', 1 );
+
   }
   // set up the rightmost AE column
   sheet.getRange( 'AE11' ).setValue( source ); // previous round
@@ -70,12 +72,13 @@ function nextRound( s ) {
   
 }
 
-function DetermineNextRound( source, phase ) {
+function DetermineNextRound( source ) {
   var ss = String( source );
 //  Browser.msgBox( 'source string = ' + ss );
   var thisRound = ss.substring( 0, 2 ); // SR or OR
   var thisR = 0;
   var thisRoundNumber, phase, sss;
+// Browser.msgBox( PropertiesService.getDocumentProperties().getProperty( 'SRPhase' ) );
   
 //  Browser.msgBox( 'thisRound = ' + thisRound );
 
@@ -87,8 +90,12 @@ function DetermineNextRound( source, phase ) {
     phase = sss.getRange( 'A11' ).getValue();
     
   } else {
-    if ( thisRound != 'OR' ) {
-      Browser.msgBox( 'Something is wrong in DetermineNextRound - it should be an OR, right?');
+    if ( thisRound != 'OR' ) { // ie Privates Auction
+      if ( thisRound != 'Privates Auction' ) {
+        Browser.msgBox( 'Something is wrong in DetermineNextRound - it should be an OR, right?');
+      } else {
+        return 'SR1';
+      }
     }    
     thisRoundNumber = parseFloat( ss.substring( 2, 6 ) ); // 1, 1.1, 2.2, etc (will never be bigger than OR99.3?)
     thisR = ( thisRoundNumber * 10 ) % 10; // 0, 1, 2
@@ -102,7 +109,7 @@ function DetermineNextRound( source, phase ) {
   
   var ORsPerPhase = [ 1,2,2,3,3,3 ];
   var numberOfORs = ORsPerPhase[ phase - 2 ];
-  Browser.msgBox( "Number of ORs this phase = " + numberOfORs );
+//  Browser.msgBox( "Number of ORs this phase = " + numberOfORs );
 
   // Browser.msgBox( "switching " + thisRound + thisR + numberOfORs );
   // return the next round
@@ -139,21 +146,24 @@ function GetExportedTrains( source ) {
   var Phase = ss.getRange( 'A11' ).getValue();
   var Current = ss.getRange( 'Y20' ).getValue();
   var Last = parseInt( Current.substring( Current.length-1, Current.length ) );
+  if ( Current.length == 0 ) { 
+    Last = 2; // handle the first export well enough
+  }
   
-  Browser.msgBox( 'most recently exported was ' + Last );
-                 
+  // Browser.msgBox( 'most recently exported was ' + Last );
+  Browser.msgBox( String( source ) );
+  Browser.msgBox ( String( ss.getRange( 'AA13' ).getValue() ) );
+  Browser.msgBox ( "Last = " + Last );
   if ( Phase < 5 && String( source ).substring( 0, 2 ) == 'OR' ) {
- //   var data = ss.getRange( 'F15:T15' ).getValues(); // get existing values <- wtf is this doing here now?
-
     switch ( Last ) {
       case 4:
       case 3:
-        if ( parseFloat( ss.getRange( 'AA13' ).getValue().substring( 0,1 ) ) > 0 ) {
+        if ( parseFloat( String( ss.getRange( 'AA13' ).getValue() ).substring( 0,1 ) ) > 0 ) {
           // Don't even check the 2s, since they might be rusted. Are there any 3s left? If so, export one.
           return Current + " 3";
         }
 
-        if ( parseFloat( ss.getRange( 'AA14' ).getValue().substring( 0,1 ) ) > 0 ) {
+        if ( parseFloat( String( ss.getRange( 'AA14' ).getValue() ).substring( 0,1 ) ) > 0 ) {
           // There weren't any 3s left. Are there any 4s left? If so, export one.
           return Current + " 4";
         } else {
@@ -165,17 +175,17 @@ function GetExportedTrains( source ) {
         Browser.msgBox( "Something has gone wrong with the Last Exported Train! Case 3 Last = " + Last );
         break;
       case 2:
-        if ( parseFloat( ss.getRange( 'AA12' ).getValue().substring( 0,1 ) ) > 0 ) {
+         if ( parseFloat( String( ss.getRange( 'AA12' ).getValue() ).substring( 0,1 ) ) > 0 ) {
           // If there are any 2s left, export one.
           return Current + " 2";
         }
         
-        if ( parseFloat( ss.getRange( 'AA13' ).getValue().substring( 0,1 ) ) > 0 ) {
+        if ( parseFloat( String( ss.getRange( 'AA13' ).getValue() ).substring( 0,1 ) ) > 0 ) {
           // There weren't any 2s left. Are there any 3s left? If so, export one.
           return Current + " 3";
         }
 
-        if ( parseFloat( ss.getRange( 'AA14' ).getValue().substring( 0,1 ) ) > 0 ) {
+        if ( parseFloat( String( ss.getRange( 'AA14' ).getValue() ).substring( 0,1 ) ) > 0 ) {
           // There weren't any 3s left. Are there any 4s left? If so, export one. I find this highly unlikely (and thus don't have the check above for no 4s left either).
           return Current + " 4";
         }
@@ -211,17 +221,11 @@ function CopyRange( source, dest, copyrange ) {
 
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu( '1889 Menu' )
-    .addItem( 'Next Round' , 'menuItem1' )
+  ui.createMenu( '18xx Menu' )
+    .addItem( 'Next Round' , 'nextRound' )
     .addItem( 'Randomize CV', 'RandomCVCompany' )
-    .addItem( 'Destructive Reset', 'Cleanup' )
+ //   .addItem( 'Destructive Reset', 'Cleanup' )
   .addToUi();
-}
-
-function menuItem1() {
-  nextRound( 
-    SpreadsheetApp.getActiveSheet().getRange( 'AE13' ).getValues()
-  );
 }
 
 function Cleanup() {
@@ -240,10 +244,10 @@ function Cleanup() {
   // clear out the Privates Auction
   var thisSheet = SpreadsheetApp.getActive().getSheetByName( 'Privates Auction' );
   thisSheet.getRange( 'A3:A8' ).setValue( '' ); // blank out the players
-  thisSheet.getRange( 'G3:M8' ).setValue( '' ); // blank out the bids
+  thisSheet.getRange( 'G3:L8' ).setValue( '' ); // blank out the bids
   thisSheet.getRange( 'V3:V8' ).setValue( '' ); // blank out the privates  
   thisSheet.getRange( 'AA3:AA8' ).setValue( '' ); // blank out the revenue
-  thisSheet.getRange( '$AE$16' ).setValue( '<Push the button!>' );
+  thisSheet.getRange( 'AE16' ).setValue( '<Push the button!>' );
 
   // hide the template
   var templateSheet = SpreadsheetApp.getActive().getSheetByName( 'template' );
