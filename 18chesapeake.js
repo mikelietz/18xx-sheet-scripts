@@ -2,7 +2,7 @@
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/18chesapeake.js
 // @OnlyCurrentDoc
 
-/* Version 0.0 */
+/* Version 0.1 */
 function nextRound() {
   var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName(); //this is tab name (also in AE13)
   var sheet = SpreadsheetApp.getActive();
@@ -151,9 +151,6 @@ function GetExportedTrains( source ) {
   }
   
   // Browser.msgBox( 'most recently exported was ' + Last );
-  Browser.msgBox( String( source ) );
-  Browser.msgBox ( String( ss.getRange( 'AA13' ).getValue() ) );
-  Browser.msgBox ( "Last = " + Last );
   if ( Phase < 5 && String( source ).substring( 0, 2 ) == 'OR' ) {
     switch ( Last ) {
       case 4:
