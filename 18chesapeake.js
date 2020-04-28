@@ -109,9 +109,6 @@ function DetermineNextRound( source ) {
   
   var ORsPerPhase = [ 1,2,2,3,3,3 ];
   var numberOfORs = ORsPerPhase[ phase - 2 ];
-//  Browser.msgBox( "Number of ORs this phase = " + numberOfORs );
-
-  // Browser.msgBox( "switching " + thisRound + thisR + numberOfORs );
   // return the next round
   switch ( thisRound + thisR + numberOfORs ) { // read as round whatever X out of Y
     case 'SR01':
@@ -151,7 +148,7 @@ function GetExportedTrains( source, destination ) {
   }
   
   // Browser.msgBox( 'most recently exported was ' + Last );
-  Browser.msgBox( String( destination ) );
+  // Browser.msgBox( String( destination ) );
   if ( Phase < 5 && String( destination ).substring( 0, 2 ) == 'SR' ) {
     switch ( Last ) {
       case 4:
