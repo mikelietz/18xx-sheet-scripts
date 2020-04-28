@@ -2,7 +2,7 @@
 // https://github.com/mikelietz/18xx-sheet-scripts/blob/master/18chesapeake.js
 // @OnlyCurrentDoc
 
-/* Version 0.1 */
+/* Version 0.2 */
 function nextRound() {
   var source = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName(); //this is tab name (also in AE13)
   var sheet = SpreadsheetApp.getActive();
@@ -11,7 +11,7 @@ function nextRound() {
   if( source != "Privates Auction" ) {
 
     // If it's the end of an OR, we need to export a train. The last exported train will also represent the current Phase until Phase 5.
-    var exportedTrains = GetExportedTrains( source );
+    var exportedTrains = GetExportedTrains( source, destination );
     var lastExportedTrain = exportedTrains.charAt( exportedTrains.length - 1);
     var Phase = Math.max( lastExportedTrain, sheet.getRange( 'A11' ).getValue() );
  
@@ -91,7 +91,7 @@ function DetermineNextRound( source ) {
     
   } else {
     if ( thisRound != 'OR' ) { // ie Privates Auction
-      if ( thisRound != 'Privates Auction' ) {
+      if ( thisRound != 'Pr' ) {
         Browser.msgBox( 'Something is wrong in DetermineNextRound - it should be an OR, right?');
       } else {
         return 'SR1';
@@ -140,7 +140,7 @@ function DetermineNextRound( source ) {
   }  
 }
 
-function GetExportedTrains( source ) {
+function GetExportedTrains( source, destination ) {
   var sss = SpreadsheetApp.getActive();
   var ss = sss.getSheetByName( source );
   var Phase = ss.getRange( 'A11' ).getValue();
@@ -151,7 +151,8 @@ function GetExportedTrains( source ) {
   }
   
   // Browser.msgBox( 'most recently exported was ' + Last );
-  if ( Phase < 5 && String( source ).substring( 0, 2 ) == 'OR' ) {
+  Browser.msgBox( String( destination ) );
+  if ( Phase < 5 && String( destination ).substring( 0, 2 ) == 'SR' ) {
     switch ( Last ) {
       case 4:
       case 3:
@@ -221,7 +222,7 @@ function onOpen() {
   ui.createMenu( '18xx Menu' )
     .addItem( 'Next Round' , 'nextRound' )
     .addItem( 'Randomize CV', 'RandomCVCompany' )
- //   .addItem( 'Destructive Reset', 'Cleanup' )
+//    .addItem( 'Destructive Reset', 'Cleanup' )
   .addToUi();
 }
 
